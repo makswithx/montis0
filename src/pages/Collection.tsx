@@ -1,16 +1,17 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import ProductCard, { Product } from "@/components/product/ProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import FilterSidebar from "@/components/collection/FilterSidebar";
 import SortDropdown, { SortOption } from "@/components/collection/SortDropdown";
-import { products, filterOptions } from "@/data/products";
+import { products, filterOptions, collections } from "@/data/products";
 import { SlidersHorizontal, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Collection = () => {
   const [searchParams] = useSearchParams();
   const initialGender = searchParams.get("gender");
+  const initialCollection = searchParams.get("collection");
 
   const [sortBy, setSortBy] = useState<SortOption>("popular");
   const [selectedFilters, setSelectedFilters] = useState({
@@ -19,6 +20,7 @@ const Collection = () => {
     genders: initialGender ? [initialGender] : ([] as string[]),
     volumes: [] as string[],
     priceRange: filterOptions.priceRange as [number, number],
+    collection: initialCollection || "",
   });
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
@@ -28,9 +30,14 @@ const Collection = () => {
         ...prev,
         priceRange: value as [number, number],
       }));
+    } else if (filterType === "collection") {
+      setSelectedFilters((prev) => ({
+        ...prev,
+        collection: prev.collection === value ? "" : (value as string),
+      }));
     } else {
       const key = filterType as keyof typeof selectedFilters;
-      if (key !== "priceRange") {
+      if (key !== "priceRange" && key !== "collection") {
         setSelectedFilters((prev) => {
           const current = prev[key] as string[];
           const valueStr = value as string;
@@ -52,6 +59,7 @@ const Collection = () => {
       genders: [],
       volumes: [],
       priceRange: filterOptions.priceRange,
+      collection: "",
     });
   };
 
@@ -89,6 +97,14 @@ const Collection = () => {
         return false;
       }
 
+      // Collection filter
+      if (
+        selectedFilters.collection &&
+        product.collection !== selectedFilters.collection
+      ) {
+        return false;
+      }
+
       // Price filter
       if (
         product.price < selectedFilters.priceRange[0] ||
@@ -105,7 +121,6 @@ const Collection = () => {
     const sorted = [...filteredProducts];
     switch (sortBy) {
       case "newest":
-        // In a real app, you'd sort by date
         return sorted.reverse();
       case "price-asc":
         return sorted.sort((a, b) => a.price - b.price);
@@ -122,10 +137,13 @@ const Collection = () => {
     selectedFilters.types.length +
     selectedFilters.genders.length +
     selectedFilters.volumes.length +
+    (selectedFilters.collection ? 1 : 0) +
     (selectedFilters.priceRange[0] !== filterOptions.priceRange[0] ||
     selectedFilters.priceRange[1] !== filterOptions.priceRange[1]
       ? 1
       : 0);
+
+  const currentCollection = collections.find(c => c.slug === selectedFilters.collection);
 
   return (
     <Layout>
@@ -133,11 +151,47 @@ const Collection = () => {
       <section className="py-12 md:py-16 border-b border-border">
         <div className="container-eleya">
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-wide text-center">
-            Kolekcija
+            {currentCollection ? currentCollection.name : "Kolekcija"}
           </h1>
-          <p className="font-body text-muted-foreground text-center mt-3">
+          {currentCollection && (
+            <p className="font-body text-muted-foreground text-center mt-3">
+              {currentCollection.description}
+            </p>
+          )}
+          <p className="font-body text-muted-foreground text-center mt-2">
             {sortedProducts.length} proizvoda
           </p>
+        </div>
+      </section>
+
+      {/* Collection Quick Filters */}
+      <section className="border-b border-border">
+        <div className="container-eleya py-4 overflow-x-auto">
+          <div className="flex gap-2 min-w-max">
+            <button
+              onClick={() => handleFilterChange("collection", "")}
+              className={`px-4 py-2 font-body text-sm tracking-wide transition-colors ${
+                !selectedFilters.collection
+                  ? "bg-foreground text-background"
+                  : "bg-transparent text-muted-foreground hover:text-foreground border border-border"
+              }`}
+            >
+              Sve
+            </button>
+            {collections.map((collection) => (
+              <button
+                key={collection.id}
+                onClick={() => handleFilterChange("collection", collection.slug)}
+                className={`px-4 py-2 font-body text-sm tracking-wide transition-colors ${
+                  selectedFilters.collection === collection.slug
+                    ? "bg-foreground text-background"
+                    : "bg-transparent text-muted-foreground hover:text-foreground border border-border"
+                }`}
+              >
+                {collection.name}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
