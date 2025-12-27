@@ -296,14 +296,8 @@ const Collection = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {sortedProducts.map((product, index) => (
-                    <div
-                      key={product.id}
-                      className="opacity-0 animate-slide-up"
-                      style={{ animationDelay: `${0.05 * (index % 8)}s` }}
-                    >
-                      <ProductCard product={product} />
-                    </div>
+                  {sortedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               )}
