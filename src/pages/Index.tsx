@@ -25,29 +25,17 @@ const Index = () => {
 
         <div className="relative z-10 container-eleya">
           <div className="max-w-xl">
-            <p 
-              className="font-body text-sm tracking-[0.3em] uppercase text-bone-light/80 mb-4 animate-fade-in"
-              style={{ animationDelay: "0.1s" }}
-            >
+            <p className="font-body text-sm tracking-[0.3em] uppercase text-bone-light/80 mb-4">
               Ekskluzivna parfumerija
             </p>
-            <h1
-              className="font-display text-5xl md:text-6xl lg:text-7xl tracking-wide mb-6 text-bone-light opacity-0 animate-slide-up"
-              style={{ animationDelay: "0.2s" }}
-            >
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl tracking-wide mb-6 text-bone-light">
               ELEYA
             </h1>
-            <p
-              className="font-body text-lg tracking-wide mb-10 text-bone-light/90 opacity-0 animate-slide-up leading-relaxed"
-              style={{ animationDelay: "0.4s" }}
-            >
+            <p className="font-body text-lg tracking-wide mb-10 text-bone-light/90 leading-relaxed">
               Preko 3.500 originalnih parfema od vodećih svjetskih brendova.
               Pronađite svoj savršeni miris.
             </p>
-            <div
-              className="flex flex-col sm:flex-row gap-4 opacity-0 animate-slide-up"
-              style={{ animationDelay: "0.6s" }}
-            >
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button variant="gold" size="lg" asChild>
                 <Link to="/kolekcija">
                   Istražite kolekciju
@@ -74,12 +62,11 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {collections.map((collection, index) => (
+            {collections.map((collection) => (
               <Link
                 key={collection.id}
                 to={`/kolekcija?collection=${collection.slug}`}
-                className="relative aspect-[4/5] group overflow-hidden opacity-0 animate-slide-up"
-                style={{ animationDelay: `${0.1 * index}s` }}
+                className="relative aspect-[4/5] group overflow-hidden"
               >
                 <img
                   src={collection.image}
@@ -121,14 +108,8 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {featuredProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className="opacity-0 animate-slide-up"
-                style={{ animationDelay: `${0.1 * index}s` }}
-              >
-                <ProductCard product={product} />
-              </div>
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
@@ -154,14 +135,8 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {newProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className="opacity-0 animate-slide-up"
-                style={{ animationDelay: `${0.1 * index}s` }}
-              >
-                <ProductCard product={product} />
-              </div>
+            {newProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
@@ -197,12 +172,11 @@ const Index = () => {
                 image: "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?w=600&h=800&fit=crop",
                 link: "/kolekcija?gender=Unisex",
               },
-            ].map((category, index) => (
+            ].map((category) => (
               <Link
                 key={category.title}
                 to={category.link}
-                className="relative aspect-[3/4] group overflow-hidden opacity-0 animate-slide-up"
-                style={{ animationDelay: `${0.15 * index}s` }}
+                className="relative aspect-[3/4] group overflow-hidden"
               >
                 <img
                   src={category.image}
