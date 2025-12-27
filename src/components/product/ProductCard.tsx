@@ -10,6 +10,7 @@ export interface Product {
   type: string;
   volume: string;
   gender: string;
+  collection?: string;
 }
 
 interface ProductCardProps {
