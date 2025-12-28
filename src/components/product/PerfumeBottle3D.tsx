@@ -1,6 +1,6 @@
-import { useRef } from "react";
+import { useRef, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
+import { OrbitControls, Environment, ContactShadows, useGLTF, Center } from "@react-three/drei";
 import * as THREE from "three";
 
 interface PerfumeBottleProps {
@@ -94,12 +94,31 @@ const PerfumeBottle = ({ color = "#d4a574", capColor = "#1a1a1a" }: PerfumeBottl
   );
 };
 
+// GLB Model component
+const GLBModel = ({ modelPath }: { modelPath: string }) => {
+  const { scene } = useGLTF(modelPath);
+  const modelRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (modelRef.current) {
+      modelRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+    }
+  });
+
+  return (
+    <Center>
+      <primitive ref={modelRef} object={scene} scale={2.5} />
+    </Center>
+  );
+};
+
 interface Product3DViewerProps {
   productName: string;
   brandColor?: string;
+  has3DModel?: boolean;
 }
 
-const Product3DViewer = ({ productName, brandColor }: Product3DViewerProps) => {
+const Product3DViewer = ({ productName, brandColor, has3DModel }: Product3DViewerProps) => {
   // Map some brands to colors
   const getBottleColor = () => {
     const name = productName.toLowerCase();
@@ -128,8 +147,14 @@ const Product3DViewer = ({ productName, brandColor }: Product3DViewerProps) => {
         {/* Environment for reflections */}
         <Environment preset="studio" />
 
-        {/* The bottle */}
-        <PerfumeBottle color={getBottleColor()} />
+        {/* The bottle - GLB model or procedural */}
+        <Suspense fallback={null}>
+          {has3DModel ? (
+            <GLBModel modelPath="/models/tom-ford-bottle.glb" />
+          ) : (
+            <PerfumeBottle color={getBottleColor()} />
+          )}
+        </Suspense>
 
         {/* Shadow */}
         <ContactShadows
@@ -148,7 +173,7 @@ const Product3DViewer = ({ productName, brandColor }: Product3DViewerProps) => {
           maxDistance={10}
           minPolarAngle={Math.PI / 6}
           maxPolarAngle={Math.PI / 1.5}
-          autoRotate
+          autoRotate={!has3DModel}
           autoRotateSpeed={0.5}
         />
       </Canvas>

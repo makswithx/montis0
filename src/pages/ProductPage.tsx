@@ -60,7 +60,10 @@ const ProductPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
             {/* 3D Product Viewer */}
             <div>
-              <Product3DViewer productName={product.name} />
+              <Product3DViewer 
+                productName={product.name} 
+                has3DModel={product.has3DModel}
+              />
             </div>
 
             {/* Product Info */}
