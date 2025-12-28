@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/product/ProductCard";
+import ProductRotator from "@/components/product/ProductRotator";
 import { Button } from "@/components/ui/button";
 import { products } from "@/data/products";
 import { ChevronLeft, Minus, Plus, Heart, Share2 } from "lucide-react";
@@ -11,7 +12,6 @@ const ProductPage = () => {
   const { id } = useParams();
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(0);
 
   const product = products.find((p) => p.id === id);
 
@@ -28,12 +28,13 @@ const ProductPage = () => {
     );
   }
 
-  // Mock additional images
-  const productImages = [
-    product.image,
-    product.image.replace("w=600", "w=601"),
-    product.image.replace("w=600", "w=602"),
-  ];
+  // Generate rotation images (simulating 360° view with 8 angles)
+  const rotationImages = Array.from({ length: 8 }, (_, i) => {
+    // Slightly vary the image URL to simulate different angles
+    const baseUrl = product.image;
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    return `${baseUrl}${separator}angle=${i}`;
+  });
 
   const relatedProducts = products
     .filter((p) => p.id !== product.id && p.brand === product.brand)
@@ -65,37 +66,12 @@ const ProductPage = () => {
       <section className="py-8 md:py-12">
         <div className="container-eleya">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-            {/* Images */}
-            <div className="space-y-4">
-              {/* Main Image */}
-              <div className="aspect-[3/4] bg-bone-light overflow-hidden">
-                <img
-                  src={productImages[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover animate-fade-in"
-                />
-              </div>
-
-              {/* Thumbnails */}
-              <div className="flex gap-3">
-                {productImages.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square w-20 md:w-24 overflow-hidden transition-all ${
-                      selectedImage === index
-                        ? "ring-2 ring-foreground"
-                        : "opacity-60 hover:opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+            {/* 360° Product Rotator */}
+            <div>
+              <ProductRotator 
+                images={rotationImages} 
+                productName={product.name} 
+              />
             </div>
 
             {/* Product Info */}
