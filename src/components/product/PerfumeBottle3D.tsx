@@ -107,7 +107,7 @@ const GLBModel = ({ modelPath }: { modelPath: string }) => {
 
   return (
     <Center>
-      <primitive ref={modelRef} object={scene} scale={2.5} />
+      <primitive ref={modelRef} object={scene} scale={1} />
     </Center>
   );
 };
@@ -134,7 +134,7 @@ const Product3DViewer = ({ productName, brandColor, has3DModel }: Product3DViewe
   return (
     <div className="aspect-[3/4] bg-gradient-to-b from-bone-light to-bone relative rounded-sm overflow-hidden">
       <Canvas
-        camera={{ position: [0, 2, 6], fov: 45 }}
+        camera={{ position: [0, 2, 12], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
       >
@@ -169,8 +169,8 @@ const Product3DViewer = ({ productName, brandColor, has3DModel }: Product3DViewe
         <OrbitControls
           enablePan={false}
           enableZoom={true}
-          minDistance={4}
-          maxDistance={10}
+          minDistance={5}
+          maxDistance={25}
           minPolarAngle={Math.PI / 6}
           maxPolarAngle={Math.PI / 1.5}
           autoRotate={!has3DModel}
