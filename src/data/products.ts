@@ -117,14 +117,15 @@ export const products: Product[] = [
   },
   {
     id: "17",
-    name: "Allure Homme Sport",
-    brand: "Chanel",
-    price: 125,
-    image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&h=800&fit=crop",
-    type: "EDT",
+    name: "Private Blend",
+    brand: "Tom Ford",
+    price: 320,
+    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=800&fit=crop",
+    type: "EDP",
     volume: "100ml",
-    gender: "Muški",
-    collection: "summer",
+    gender: "Unisex",
+    collection: "signature",
+    has3DModel: true,
   },
 
   // Dior
