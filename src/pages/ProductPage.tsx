@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/product/ProductCard";
-import ProductRotator from "@/components/product/ProductRotator";
+import Product3DViewer from "@/components/product/PerfumeBottle3D";
 import { Button } from "@/components/ui/button";
 import { products } from "@/data/products";
 import { ChevronLeft, Minus, Plus, Heart, Share2 } from "lucide-react";
@@ -27,18 +27,6 @@ const ProductPage = () => {
       </Layout>
     );
   }
-
-  // Placeholder rotation images - different perfume angles using varied stock photos
-  const rotationImages = [
-    product.image,
-    "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=800&fit=crop",
-    "https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&h=800&fit=crop",
-    "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=600&h=800&fit=crop",
-    "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&h=800&fit=crop",
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=800&fit=crop",
-    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&h=800&fit=crop",
-    "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?w=600&h=800&fit=crop",
-  ];
 
   const relatedProducts = products
     .filter((p) => p.id !== product.id && p.brand === product.brand)
@@ -70,12 +58,9 @@ const ProductPage = () => {
       <section className="py-8 md:py-12">
         <div className="container-eleya">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-            {/* 360° Product Rotator */}
+            {/* 3D Product Viewer */}
             <div>
-              <ProductRotator 
-                images={rotationImages} 
-                productName={product.name} 
-              />
+              <Product3DViewer productName={product.name} />
             </div>
 
             {/* Product Info */}
