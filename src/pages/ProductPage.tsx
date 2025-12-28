@@ -28,13 +28,17 @@ const ProductPage = () => {
     );
   }
 
-  // Generate rotation images (simulating 360° view with 8 angles)
-  const rotationImages = Array.from({ length: 8 }, (_, i) => {
-    // Slightly vary the image URL to simulate different angles
-    const baseUrl = product.image;
-    const separator = baseUrl.includes("?") ? "&" : "?";
-    return `${baseUrl}${separator}angle=${i}`;
-  });
+  // Placeholder rotation images - different perfume angles using varied stock photos
+  const rotationImages = [
+    product.image,
+    "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?w=600&h=800&fit=crop",
+  ];
 
   const relatedProducts = products
     .filter((p) => p.id !== product.id && p.brand === product.brand)
