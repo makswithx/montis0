@@ -132,17 +132,68 @@ const Product3DViewer = ({ productName, brandColor, has3DModel }: Product3DViewe
   };
 
   return (
-    <div className="aspect-[3/4] bg-gradient-to-b from-bone-light to-bone relative rounded-sm overflow-hidden">
+    <div className="aspect-[3/4] relative rounded-sm overflow-hidden">
+      {/* Luxurious background layers */}
+      <div className="absolute inset-0 bg-gradient-to-br from-obsidian via-[#1a1a1f] to-[#0a0a0c]" />
+      
+      {/* Radial gold accent glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(37_52%_43%_/_0.15)_0%,_transparent_60%)]" />
+      
+      {/* Subtle diamond pattern overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            hsl(37 52% 43% / 0.3) 10px,
+            hsl(37 52% 43% / 0.3) 11px
+          ),
+          repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 10px,
+            hsl(37 52% 43% / 0.3) 10px,
+            hsl(37 52% 43% / 0.3) 11px
+          )`
+        }}
+      />
+      
+      {/* Top spotlight effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-[50%] bg-[radial-gradient(ellipse_at_top,_hsl(40_14%_95%_/_0.08)_0%,_transparent_70%)]" />
+      
+      {/* Bottom reflection glow */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-[30%] bg-[radial-gradient(ellipse_at_bottom,_hsl(37_52%_43%_/_0.2)_0%,_transparent_70%)]" />
+      
+      {/* Animated corner accents */}
+      <div className="absolute top-0 left-0 w-24 h-24 border-l border-t border-accent/20" />
+      <div className="absolute top-0 right-0 w-24 h-24 border-r border-t border-accent/20" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 border-l border-b border-accent/20" />
+      <div className="absolute bottom-0 right-0 w-24 h-24 border-r border-b border-accent/20" />
+      
+      {/* Floating particles effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[20%] left-[15%] w-1 h-1 bg-accent/40 rounded-full animate-pulse" style={{ animationDelay: '0s' }} />
+        <div className="absolute top-[40%] right-[20%] w-0.5 h-0.5 bg-accent/30 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-[30%] left-[25%] w-0.5 h-0.5 bg-bone/20 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[60%] right-[30%] w-1 h-1 bg-accent/20 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute bottom-[45%] left-[10%] w-0.5 h-0.5 bg-bone/15 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
+      </div>
+
       <Canvas
         camera={{ position: [0, 2, 12], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
+        className="relative z-10"
       >
-        {/* Lighting */}
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
-        <directionalLight position={[-5, 3, -5]} intensity={0.5} />
-        <spotLight position={[0, 10, 0]} intensity={0.3} angle={0.3} />
+        {/* Enhanced lighting for dark background */}
+        <ambientLight intensity={0.3} />
+        <directionalLight position={[5, 5, 5]} intensity={1.2} castShadow color="#fff8f0" />
+        <directionalLight position={[-5, 3, -5]} intensity={0.6} color="#a67a34" />
+        <spotLight position={[0, 10, 0]} intensity={0.5} angle={0.3} color="#ffffff" />
+        <spotLight position={[-3, 5, 3]} intensity={0.3} angle={0.5} color="#a67a34" />
+        <pointLight position={[0, -2, 3]} intensity={0.2} color="#d4af37" />
 
         {/* Environment for reflections */}
         <Environment preset="studio" />
@@ -159,10 +210,11 @@ const Product3DViewer = ({ productName, brandColor, has3DModel }: Product3DViewe
         {/* Shadow */}
         <ContactShadows
           position={[0, -1, 0]}
-          opacity={0.4}
+          opacity={0.6}
           scale={5}
           blur={2}
           far={4}
+          color="#000000"
         />
 
         {/* Controls */}
@@ -178,10 +230,10 @@ const Product3DViewer = ({ productName, brandColor, has3DModel }: Product3DViewe
         />
       </Canvas>
 
-      {/* Instruction overlay */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-body text-muted-foreground pointer-events-none">
+      {/* Instruction overlay - refined for dark bg */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-obsidian/60 backdrop-blur-md border border-accent/20 px-4 py-2 rounded-full text-sm font-body text-bone/70 pointer-events-none">
         <svg
-          className="w-4 h-4"
+          className="w-4 h-4 text-accent/70"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

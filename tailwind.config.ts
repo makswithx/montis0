@@ -56,7 +56,10 @@ export default {
           light: "hsl(var(--gold-light))",
         },
         stone: "hsl(var(--stone))",
-        obsidian: "hsl(var(--obsidian))",
+        obsidian: {
+          DEFAULT: "hsl(var(--obsidian))",
+          deep: "hsl(var(--obsidian-deep))",
+        },
         bone: {
           DEFAULT: "hsl(var(--bone))",
           light: "hsl(var(--bone-light))",
