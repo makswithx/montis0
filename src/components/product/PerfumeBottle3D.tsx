@@ -2,7 +2,7 @@ import { useRef, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, useGLTF, Center } from "@react-three/drei";
 import * as THREE from "three";
-import luxuryBg from "@/assets/luxury-dark-bg.jpg";
+import luxuryBg from "@/assets/ombre-leather-bg.jpg";
 
 interface PerfumeBottleProps {
   color?: string;
