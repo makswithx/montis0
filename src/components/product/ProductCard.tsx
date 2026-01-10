@@ -11,7 +11,6 @@ export interface Product {
   volume: string;
   gender: string;
   collection?: string;
-  has3DModel?: boolean;
 }
 
 interface ProductCardProps {
