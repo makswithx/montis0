@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/product/ProductCard";
-import Product3DViewer from "@/components/product/PerfumeBottle3D";
 import { Button } from "@/components/ui/button";
 import { products } from "@/data/products";
 import { ChevronLeft, Minus, Plus, Heart, Share2 } from "lucide-react";
@@ -58,11 +57,12 @@ const ProductPage = () => {
       <section className="py-8 md:py-12">
         <div className="container-eleya">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-            {/* 3D Product Viewer */}
-            <div>
-              <Product3DViewer 
-                productName={product.name} 
-                has3DModel={product.has3DModel}
+            {/* Product Image */}
+            <div className="relative aspect-[3/4] bg-muted rounded-lg overflow-hidden">
+              <img 
+                src={product.image} 
+                alt={product.name}
+                className="w-full h-full object-cover"
               />
             </div>
 

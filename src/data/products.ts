@@ -125,7 +125,6 @@ export const products: Product[] = [
     volume: "100ml",
     gender: "Unisex",
     collection: "signature",
-    has3DModel: true,
   },
 
   // Dior
