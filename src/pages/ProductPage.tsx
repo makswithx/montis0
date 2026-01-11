@@ -17,7 +17,7 @@ const ProductPage = () => {
   if (!product) {
     return (
       <Layout>
-        <div className="container-eleya py-20 text-center">
+        <div className="container-montis py-20 text-center">
           <h1 className="font-display text-2xl mb-4">Proizvod nije pronađen</h1>
           <Link to="/kolekcija" className="nav-link">
             ← Nazad na kolekciju
@@ -42,7 +42,7 @@ const ProductPage = () => {
     <Layout>
       {/* Breadcrumb */}
       <section className="py-4 border-b border-border">
-        <div className="container-eleya">
+        <div className="container-montis">
           <Link
             to="/kolekcija"
             className="flex items-center gap-2 font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -55,7 +55,7 @@ const ProductPage = () => {
 
       {/* Product Section */}
       <section className="py-8 md:py-12">
-        <div className="container-eleya">
+        <div className="container-montis">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
             {/* Product Image */}
             <div className="relative aspect-[3/4] bg-muted rounded-lg overflow-hidden">
@@ -95,9 +95,9 @@ const ProductPage = () => {
 
               {/* Description */}
               <p className="font-body text-muted-foreground leading-relaxed">
-                Ekskluzivan parfem iz kolekcije {product.brand}. 
-                Bogat, sofisticiran miris koji ostavlja nezaboravan utisak.
-                Idealan za posebne prilike i svakodnevnu eleganciju.
+                Autentični parfem iz kolekcije {product.brand}. 
+                Pažljivo odabran i provjeren za originalnost.
+                Svaki proizvod dolazi s garancijom autentičnosti.
               </p>
 
               {/* Quantity */}
@@ -174,7 +174,7 @@ const ProductPage = () => {
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <section className="py-16 md:py-24 border-t border-border mb-20 lg:mb-0">
-          <div className="container-eleya">
+          <div className="container-montis">
             <h2 className="font-display text-2xl md:text-3xl tracking-wide mb-8 text-center">
               Takođe od {product.brand}
             </h2>

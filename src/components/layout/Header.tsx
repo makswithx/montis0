@@ -14,7 +14,7 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
-      <div className="container-eleya">
+      <div className="container-montis">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Mobile Menu Toggle */}
           <button
@@ -45,7 +45,7 @@ const Header = () => {
             to="/"
             className="font-display text-2xl md:text-3xl tracking-[0.15em] text-foreground absolute left-1/2 -translate-x-1/2"
           >
-            ELEYA
+            Montis
           </Link>
 
           {/* Right Actions */}
@@ -82,7 +82,7 @@ const Header = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-background border-t border-border/50 animate-fade-in">
-          <nav className="container-eleya py-6 flex flex-col gap-4">
+          <nav className="container-montis py-6 flex flex-col gap-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}

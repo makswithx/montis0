@@ -23,17 +23,17 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-obsidian/90 via-obsidian/60 to-obsidian/20" />
         </div>
 
-        <div className="relative z-10 container-eleya">
+        <div className="relative z-10 container-montis">
           <div className="max-w-xl">
             <p className="font-body text-sm tracking-[0.3em] uppercase text-bone-light/80 mb-4">
-              Ekskluzivna parfumerija
+              Provjerena autentičnost
             </p>
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl tracking-wide mb-6 text-bone-light">
-              ELEYA
+              Montis
             </h1>
             <p className="font-body text-lg tracking-wide mb-10 text-bone-light/90 leading-relaxed">
-              Preko 3.500 originalnih parfema od vodećih svjetskih brendova.
-              Pronađite svoj savršeni miris.
+              Mjesto iznad sumnje. Pažljivo odabrani luksuzni parfemi 
+              s provjerenom autentičnošću.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button variant="gold" size="lg" asChild>
@@ -53,7 +53,7 @@ const Index = () => {
 
       {/* Collections Grid */}
       <section className="py-20 md:py-28">
-        <div className="container-eleya">
+        <div className="container-montis">
           <div className="text-center mb-12">
             <p className="brand-name mb-3">Izdvojene</p>
             <h2 className="font-display text-3xl md:text-4xl tracking-wide">
@@ -90,7 +90,7 @@ const Index = () => {
 
       {/* Bestsellers */}
       <section className="pb-20 md:pb-28">
-        <div className="container-eleya">
+        <div className="container-montis">
           <div className="flex items-end justify-between mb-12">
             <div>
               <p className="brand-name mb-2">Izdvajamo</p>
@@ -117,7 +117,7 @@ const Index = () => {
 
       {/* New Arrivals */}
       <section className="pb-20 md:pb-28">
-        <div className="container-eleya">
+        <div className="container-montis">
           <div className="flex items-end justify-between mb-12">
             <div>
               <p className="brand-name mb-2">Svježe</p>
@@ -144,7 +144,7 @@ const Index = () => {
 
       {/* Categories */}
       <section className="pb-20 md:pb-28">
-        <div className="container-eleya">
+        <div className="container-montis">
           <div className="text-center mb-12">
             <p className="brand-name mb-3">Pretražite po</p>
             <h2 className="font-display text-3xl md:text-4xl tracking-wide">
@@ -204,12 +204,12 @@ const Index = () => {
 
       {/* Newsletter / CTA */}
       <section className="py-20 md:py-28 bg-foreground text-bone-light">
-        <div className="container-eleya text-center max-w-2xl mx-auto">
+        <div className="container-montis text-center max-w-2xl mx-auto">
           <h2 className="font-display text-3xl md:text-4xl tracking-wide mb-4">
-            Ostanite u toku
+            Budite informirani
           </h2>
           <p className="font-body text-bone-light/70 mb-8">
-            Saznajte prvi za nove kolekcije i ekskluzivne ponude.
+            Saznajte prvi za nove kolekcije provjerenih parfema.
           </p>
           <form className="flex flex-col sm:flex-row gap-3">
             <input
