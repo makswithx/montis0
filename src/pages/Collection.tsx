@@ -6,7 +6,6 @@ import { SlidersHorizontal, X, Loader2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useShopifyProducts, useVendors } from "@/hooks/useShopifyProducts";
 import { ShopifyProduct, getProductSizes, ProductFilters } from "@/lib/shopify";
-import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -297,14 +296,42 @@ const Collection = () => {
       <div>
         <h4 className="font-display text-sm mb-3">Cijena</h4>
         <div className="px-2">
-          <Slider
-            value={priceRange}
-            onValueChange={(value) => setPriceRange(value as [number, number])}
-            max={filterOptions.maxPrice}
-            min={0}
-            step={10}
-            className="mb-3"
-          />
+          <div className="relative h-6 mb-3">
+            <input
+              type="range"
+              min={0}
+              max={filterOptions.maxPrice}
+              value={priceRange[0]}
+              onChange={(e) => {
+                const newMin = Math.min(Number(e.target.value), priceRange[1] - 10);
+                setPriceRange([newMin, priceRange[1]]);
+              }}
+              className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none z-20 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-background [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-foreground [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing"
+              style={{ top: '50%', transform: 'translateY(-50%)' }}
+            />
+            <input
+              type="range"
+              min={0}
+              max={filterOptions.maxPrice}
+              value={priceRange[1]}
+              onChange={(e) => {
+                const newMax = Math.max(Number(e.target.value), priceRange[0] + 10);
+                setPriceRange([priceRange[0], newMax]);
+              }}
+              className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none z-20 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-background [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-foreground [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing"
+              style={{ top: '50%', transform: 'translateY(-50%)' }}
+            />
+            {/* Track background */}
+            <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 bg-border rounded-full z-10" />
+            {/* Active range */}
+            <div 
+              className="absolute top-1/2 -translate-y-1/2 h-1.5 bg-foreground rounded-full z-10"
+              style={{
+                left: `${(priceRange[0] / filterOptions.maxPrice) * 100}%`,
+                right: `${100 - (priceRange[1] / filterOptions.maxPrice) * 100}%`
+              }}
+            />
+          </div>
           <div className="flex justify-between font-body text-sm text-muted-foreground">
             <span>€{priceRange[0]}</span>
             <span>€{priceRange[1]}</span>
