@@ -44,12 +44,9 @@ const Header = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2"
+            className="absolute left-1/2 -translate-x-1/2"
           >
-            <img src={montisIkona} alt="" className="h-5 md:h-6 w-auto" />
-            <span className="font-display text-2xl md:text-3xl tracking-[0.15em] text-foreground">
-              Montis
-            </span>
+            <img src={montisIkona} alt="Montis" className="h-10 md:h-12 w-auto" />
           </Link>
 
           {/* Right Actions */}
