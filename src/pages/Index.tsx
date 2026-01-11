@@ -4,7 +4,7 @@ import ProductCard from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { products, collections } from "@/data/products";
 import { ArrowRight } from "lucide-react";
-import AnimatedHero from "@/components/home/AnimatedHero";
+import VideoHero from "@/components/home/VideoHero";
 
 const Index = () => {
   const featuredProducts = products.filter(p => p.collection === "bestsellers").slice(0, 4);
@@ -12,8 +12,8 @@ const Index = () => {
 
   return (
     <Layout>
-      {/* Animated Hero Section */}
-      <AnimatedHero />
+      {/* Video Hero Section */}
+      <VideoHero />
 
       {/* Collections Grid */}
       <section className="py-20 md:py-28">
