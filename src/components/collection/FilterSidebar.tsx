@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface FilterSidebarProps {
@@ -151,17 +150,45 @@ const FilterSidebar = ({
             ))}
           </div>
 
-          {/* Slider */}
-          <div className="pt-2">
-            <Slider
-              min={filters.priceRange[0]}
-              max={filters.priceRange[1]}
-              step={1}
-              value={selectedFilters.priceRange}
-              onValueChange={(value) => onFilterChange("priceRange", value as [number, number])}
-              className="w-full"
-            />
-            <div className="flex justify-between mt-2 font-body text-xs text-muted-foreground">
+          {/* Native Range Inputs */}
+          <div className="pt-2 space-y-4">
+            <div className="relative h-6">
+              <input
+                type="range"
+                min={filters.priceRange[0]}
+                max={filters.priceRange[1]}
+                value={selectedFilters.priceRange[0]}
+                onChange={(e) => {
+                  const newMin = Math.min(Number(e.target.value), selectedFilters.priceRange[1] - 10);
+                  onFilterChange("priceRange", [newMin, selectedFilters.priceRange[1]]);
+                }}
+                className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-background [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-foreground [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing"
+                style={{ top: '50%', transform: 'translateY(-50%)' }}
+              />
+              <input
+                type="range"
+                min={filters.priceRange[0]}
+                max={filters.priceRange[1]}
+                value={selectedFilters.priceRange[1]}
+                onChange={(e) => {
+                  const newMax = Math.max(Number(e.target.value), selectedFilters.priceRange[0] + 10);
+                  onFilterChange("priceRange", [selectedFilters.priceRange[0], newMax]);
+                }}
+                className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-background [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-foreground [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing"
+                style={{ top: '50%', transform: 'translateY(-50%)' }}
+              />
+              {/* Track background */}
+              <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 bg-border rounded-full" />
+              {/* Active range */}
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 h-1.5 bg-foreground rounded-full"
+                style={{
+                  left: `${((selectedFilters.priceRange[0] - filters.priceRange[0]) / (filters.priceRange[1] - filters.priceRange[0])) * 100}%`,
+                  right: `${100 - ((selectedFilters.priceRange[1] - filters.priceRange[0]) / (filters.priceRange[1] - filters.priceRange[0])) * 100}%`
+                }}
+              />
+            </div>
+            <div className="flex justify-between font-body text-xs text-muted-foreground">
               <span>€{selectedFilters.priceRange[0]}</span>
               <span>€{selectedFilters.priceRange[1]}</span>
             </div>
