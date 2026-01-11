@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { useShopifyProduct, useShopifyProducts } from "@/hooks/useShopifyProducts";
+import { useShopifyProduct, useAllProducts } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, ShoppingCart, Heart, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import ShopifyProductCard from "@/components/product/ShopifyProductCard";
+import { formatPrice, getMetafieldValue, getProductSizes } from "@/lib/shopify";
 
 const ShopifyProductPage = () => {
   const { handle } = useParams<{ handle: string }>();
   const { data: product, isLoading, error } = useShopifyProduct(handle || "");
-  const { data: allProducts } = useShopifyProducts(8);
+  const { data: allProducts } = useAllProducts(8);
   const addItem = useCartStore((state) => state.addItem);
 
   const [quantity, setQuantity] = useState(1);
@@ -43,6 +44,14 @@ const ShopifyProductPage = () => {
   const selectedVariant = product.variants.edges[selectedVariantIndex]?.node;
   const mainImage = product.images.edges[0]?.node;
   const price = selectedVariant?.price || product.priceRange.minVariantPrice;
+  const compareAtPrice = selectedVariant?.compareAtPrice;
+  const hasDiscount = compareAtPrice && parseFloat(compareAtPrice.amount) > parseFloat(price.amount);
+
+  // Get metafield values
+  const gender = getMetafieldValue<string>(product.gender);
+  const fragranceType = getMetafieldValue<string>(product.fragranceType);
+  const notesFamily = getMetafieldValue<string>(product.notesFamily);
+  const sizes = getProductSizes(product);
 
   const handleAddToCart = () => {
     if (!selectedVariant) return;
@@ -62,7 +71,7 @@ const ShopifyProductPage = () => {
     });
   };
 
-  // Get related products (excluding current product)
+  // Get related products (excluding current product, same vendor if possible)
   const relatedProducts = allProducts?.filter(
     (p) => p.node.id !== product.id
   ).slice(0, 4) || [];
@@ -91,7 +100,7 @@ const ShopifyProductPage = () => {
         <div className="container-montis">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
             {/* Product Image */}
-            <div className="aspect-[3/4] bg-muted overflow-hidden">
+            <div className="aspect-[3/4] bg-muted overflow-hidden relative">
               {mainImage ? (
                 <img
                   src={mainImage.url}
@@ -103,14 +112,43 @@ const ShopifyProductPage = () => {
                   <span className="text-muted-foreground font-body">Nema slike</span>
                 </div>
               )}
+              {hasDiscount && (
+                <span className="absolute top-4 left-4 bg-accent text-accent-foreground px-3 py-1 font-body text-sm">
+                  Akcija
+                </span>
+              )}
             </div>
 
             {/* Product Info */}
             <div className="flex flex-col">
               <div className="mb-8">
+                {/* Brand */}
+                <p className="font-body text-sm text-muted-foreground uppercase tracking-wider mb-2">
+                  {product.vendor}
+                </p>
+                
                 <h1 className="font-display text-3xl md:text-4xl tracking-wide mb-4">
                   {product.title}
                 </h1>
+
+                {/* Product attributes */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {fragranceType && (
+                    <span className="px-2 py-1 bg-muted font-body text-xs uppercase tracking-wider">
+                      {fragranceType}
+                    </span>
+                  )}
+                  {gender && (
+                    <span className="px-2 py-1 bg-muted font-body text-xs uppercase tracking-wider">
+                      {gender === 'men' ? 'Muški' : gender === 'women' ? 'Ženski' : 'Unisex'}
+                    </span>
+                  )}
+                  {notesFamily && (
+                    <span className="px-2 py-1 bg-muted font-body text-xs uppercase tracking-wider">
+                      {notesFamily}
+                    </span>
+                  )}
+                </div>
                 
                 {product.description && (
                   <p className="font-body text-muted-foreground mb-6">
@@ -118,12 +156,20 @@ const ShopifyProductPage = () => {
                   </p>
                 )}
 
-                <div className="price-display text-2xl mb-6">
-                  {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
+                {/* Price */}
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="price-display text-2xl">
+                    {formatPrice(price.amount, price.currencyCode)}
+                  </span>
+                  {hasDiscount && (
+                    <span className="text-lg text-muted-foreground line-through">
+                      {formatPrice(compareAtPrice.amount, compareAtPrice.currencyCode)}
+                    </span>
+                  )}
                 </div>
 
-                {/* Variant Selection */}
-                {product.options.length > 0 && product.options[0].values.length > 1 && (
+                {/* Variant Selection (Size) */}
+                {product.options.length > 0 && product.variants.edges.length > 1 && (
                   <div className="mb-6">
                     <p className="font-body text-sm text-muted-foreground mb-3">
                       {product.options[0].name}
@@ -137,7 +183,7 @@ const ShopifyProductPage = () => {
                             selectedVariantIndex === index
                               ? "border-foreground bg-foreground text-background"
                               : "border-border hover:border-foreground"
-                          }`}
+                          } ${!variant.node.availableForSale ? 'opacity-50 cursor-not-allowed' : ''}`}
                           disabled={!variant.node.availableForSale}
                         >
                           {variant.node.title}
@@ -243,7 +289,7 @@ const ShopifyProductPage = () => {
           disabled={!selectedVariant?.availableForSale}
         >
           <ShoppingCart size={18} />
-          Dodaj u košaricu - {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
+          Dodaj u košaricu - {formatPrice(price.amount, price.currencyCode)}
         </Button>
       </div>
     </Layout>

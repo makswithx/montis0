@@ -1,149 +1,336 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import ProductCard from "@/components/product/ProductCard";
-import FilterSidebar from "@/components/collection/FilterSidebar";
-import SortDropdown, { SortOption } from "@/components/collection/SortDropdown";
-import { products, filterOptions, collections } from "@/data/products";
-import { SlidersHorizontal, X } from "lucide-react";
+import ShopifyProductCard from "@/components/product/ShopifyProductCard";
+import { SlidersHorizontal, X, Loader2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAllProducts, useVendors } from "@/hooks/useShopifyProducts";
+import { ShopifyProduct, getMetafieldValue, getProductSizes } from "@/lib/shopify";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type SortOption = "bestselling" | "newest" | "price-asc" | "price-desc" | "title";
 
 const Collection = () => {
-  const [searchParams] = useSearchParams();
-  const initialGender = searchParams.get("gender");
-  const initialCollection = searchParams.get("collection");
-
-  const [sortBy, setSortBy] = useState<SortOption>("popular");
-  const [selectedFilters, setSelectedFilters] = useState({
-    brands: [] as string[],
-    types: [] as string[],
-    genders: initialGender ? [initialGender] : ([] as string[]),
-    volumes: [] as string[],
-    priceRange: filterOptions.priceRange as [number, number],
-    collection: initialCollection || "",
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  const handleFilterChange = (filterType: string, value: string | [number, number]) => {
-    if (filterType === "priceRange") {
-      setSelectedFilters((prev) => ({
-        ...prev,
-        priceRange: value as [number, number],
-      }));
-    } else if (filterType === "collection") {
-      setSelectedFilters((prev) => ({
-        ...prev,
-        collection: prev.collection === value ? "" : (value as string),
-      }));
-    } else {
-      const key = filterType as keyof typeof selectedFilters;
-      if (key !== "priceRange" && key !== "collection") {
-        setSelectedFilters((prev) => {
-          const current = prev[key] as string[];
-          const valueStr = value as string;
-          return {
-            ...prev,
-            [key]: current.includes(valueStr)
-              ? current.filter((v) => v !== valueStr)
-              : [...current, valueStr],
-          };
-        });
-      }
-    }
-  };
+  // Get initial filter values from URL
+  const initialGender = searchParams.get("gender") || "";
+  const initialVendor = searchParams.get("vendor") || "";
+  const initialSort = (searchParams.get("sort") as SortOption) || "bestselling";
+  const initialSeason = searchParams.get("season") || "";
+  const initialCollection = searchParams.get("collection") || "";
 
-  const handleReset = () => {
-    setSelectedFilters({
-      brands: [],
-      types: [],
-      genders: [],
-      volumes: [],
-      priceRange: filterOptions.priceRange,
-      collection: "",
+  // Filter state
+  const [selectedVendors, setSelectedVendors] = useState<string[]>(initialVendor ? [initialVendor] : []);
+  const [selectedGenders, setSelectedGenders] = useState<string[]>(initialGender ? [initialGender] : []);
+  const [selectedFragranceTypes, setSelectedFragranceTypes] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [sortBy, setSortBy] = useState<SortOption>(initialSort);
+
+  // Fetch all products and vendors
+  const { data: products, isLoading } = useAllProducts(100);
+  const { data: vendors } = useVendors();
+
+  // Extract unique values from products
+  const filterOptions = useMemo(() => {
+    if (!products) return { sizes: [], fragranceTypes: [], maxPrice: 1000 };
+
+    const sizes = new Set<string>();
+    const fragranceTypes = new Set<string>();
+    let maxPrice = 0;
+
+    products.forEach((p) => {
+      // Sizes from variants
+      getProductSizes(p.node).forEach(size => sizes.add(size));
+      
+      // Fragrance type from metafield
+      const type = getMetafieldValue<string>(p.node.fragranceType);
+      if (type) fragranceTypes.add(type);
+      
+      // Max price
+      const price = parseFloat(p.node.priceRange.maxVariantPrice.amount);
+      if (price > maxPrice) maxPrice = price;
     });
-  };
 
+    return {
+      sizes: Array.from(sizes).sort((a, b) => {
+        const numA = parseInt(a);
+        const numB = parseInt(b);
+        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+        return a.localeCompare(b);
+      }),
+      fragranceTypes: Array.from(fragranceTypes).sort(),
+      maxPrice: Math.ceil(maxPrice / 100) * 100,
+    };
+  }, [products]);
+
+  // Set initial price range based on products
+  useEffect(() => {
+    if (filterOptions.maxPrice > 0) {
+      setPriceRange([0, filterOptions.maxPrice]);
+    }
+  }, [filterOptions.maxPrice]);
+
+  // Filter and sort products
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      // Brand filter
-      if (
-        selectedFilters.brands.length > 0 &&
-        !selectedFilters.brands.includes(product.brand)
-      ) {
+    if (!products) return [];
+
+    let filtered = products.filter((p) => {
+      const node = p.node;
+
+      // Vendor filter
+      if (selectedVendors.length > 0 && !selectedVendors.includes(node.vendor)) {
         return false;
       }
 
-      // Type filter
-      if (
-        selectedFilters.types.length > 0 &&
-        !selectedFilters.types.includes(product.type)
-      ) {
-        return false;
+      // Gender filter (from metafield)
+      if (selectedGenders.length > 0) {
+        const gender = getMetafieldValue<string>(node.gender);
+        if (!gender || !selectedGenders.includes(gender)) {
+          return false;
+        }
       }
 
-      // Gender filter
-      if (
-        selectedFilters.genders.length > 0 &&
-        !selectedFilters.genders.includes(product.gender)
-      ) {
-        return false;
+      // Fragrance type filter
+      if (selectedFragranceTypes.length > 0) {
+        const type = getMetafieldValue<string>(node.fragranceType);
+        if (!type || !selectedFragranceTypes.includes(type)) {
+          return false;
+        }
       }
 
-      // Volume filter
-      if (
-        selectedFilters.volumes.length > 0 &&
-        !selectedFilters.volumes.includes(product.volume)
-      ) {
-        return false;
+      // Size filter
+      if (selectedSizes.length > 0) {
+        const productSizes = getProductSizes(node);
+        if (!productSizes.some(size => selectedSizes.includes(size))) {
+          return false;
+        }
       }
 
-      // Collection filter
-      if (
-        selectedFilters.collection &&
-        product.collection !== selectedFilters.collection
-      ) {
-        return false;
+      // Signature collection filter
+      if (initialCollection === 'signature') {
+        const isSignature = getMetafieldValue<boolean>(node.isSignature);
+        if (!isSignature) return false;
+      }
+
+      // Season filter
+      if (initialSeason) {
+        const season = getMetafieldValue<string>(node.season);
+        if (season !== initialSeason) return false;
       }
 
       // Price filter
-      if (
-        product.price < selectedFilters.priceRange[0] ||
-        product.price > selectedFilters.priceRange[1]
-      ) {
+      const price = parseFloat(node.priceRange.minVariantPrice.amount);
+      if (price < priceRange[0] || price > priceRange[1]) {
         return false;
       }
 
       return true;
     });
-  }, [selectedFilters]);
 
-  const sortedProducts = useMemo(() => {
-    const sorted = [...filteredProducts];
+    // Sort
     switch (sortBy) {
       case "newest":
-        return sorted.reverse();
+        filtered.sort((a, b) => 
+          new Date(b.node.createdAt).getTime() - new Date(a.node.createdAt).getTime()
+        );
+        break;
       case "price-asc":
-        return sorted.sort((a, b) => a.price - b.price);
+        filtered.sort((a, b) => 
+          parseFloat(a.node.priceRange.minVariantPrice.amount) - 
+          parseFloat(b.node.priceRange.minVariantPrice.amount)
+        );
+        break;
       case "price-desc":
-        return sorted.sort((a, b) => b.price - a.price);
-      case "popular":
+        filtered.sort((a, b) => 
+          parseFloat(b.node.priceRange.minVariantPrice.amount) - 
+          parseFloat(a.node.priceRange.minVariantPrice.amount)
+        );
+        break;
+      case "title":
+        filtered.sort((a, b) => a.node.title.localeCompare(b.node.title));
+        break;
+      case "bestselling":
       default:
-        return sorted;
+        // Shopify default order is already by bestselling when no sort specified
+        break;
     }
-  }, [filteredProducts, sortBy]);
+
+    return filtered;
+  }, [products, selectedVendors, selectedGenders, selectedFragranceTypes, selectedSizes, priceRange, sortBy, initialCollection, initialSeason]);
+
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedGenders.length === 1) params.set("gender", selectedGenders[0]);
+    if (selectedVendors.length === 1) params.set("vendor", selectedVendors[0]);
+    if (sortBy !== "bestselling") params.set("sort", sortBy);
+    if (initialSeason) params.set("season", initialSeason);
+    if (initialCollection) params.set("collection", initialCollection);
+    setSearchParams(params, { replace: true });
+  }, [selectedGenders, selectedVendors, sortBy, setSearchParams, initialSeason, initialCollection]);
+
+  const handleReset = () => {
+    setSelectedVendors([]);
+    setSelectedGenders([]);
+    setSelectedFragranceTypes([]);
+    setSelectedSizes([]);
+    setPriceRange([0, filterOptions.maxPrice]);
+  };
+
+  const toggleFilter = (value: string, selected: string[], setter: (v: string[]) => void) => {
+    if (selected.includes(value)) {
+      setter(selected.filter(v => v !== value));
+    } else {
+      setter([...selected, value]);
+    }
+  };
 
   const activeFilterCount =
-    selectedFilters.brands.length +
-    selectedFilters.types.length +
-    selectedFilters.genders.length +
-    selectedFilters.volumes.length +
-    (selectedFilters.collection ? 1 : 0) +
-    (selectedFilters.priceRange[0] !== filterOptions.priceRange[0] ||
-    selectedFilters.priceRange[1] !== filterOptions.priceRange[1]
-      ? 1
-      : 0);
+    selectedVendors.length +
+    selectedGenders.length +
+    selectedFragranceTypes.length +
+    selectedSizes.length +
+    (priceRange[0] > 0 || priceRange[1] < filterOptions.maxPrice ? 1 : 0);
 
-  const currentCollection = collections.find(c => c.slug === selectedFilters.collection);
+  // Page title based on filters
+  const getPageTitle = () => {
+    if (initialVendor) return initialVendor;
+    if (initialGender === 'men') return 'Muški parfemi';
+    if (initialGender === 'women') return 'Ženski parfemi';
+    if (initialGender === 'unisex') return 'Unisex parfemi';
+    if (initialSeason === 'summer') return 'Ljetna kolekcija';
+    if (initialCollection === 'signature') return 'Signature kolekcija';
+    return 'Svi parfemi';
+  };
+
+  const FilterContent = ({ isMobile = false }: { isMobile?: boolean }) => (
+    <div className={`space-y-6 ${isMobile ? 'p-6' : ''}`}>
+      {isMobile && (
+        <div className="flex items-center justify-between pb-4 border-b border-border">
+          <h3 className="font-display text-lg">Filteri</h3>
+          <button onClick={() => setIsMobileFilterOpen(false)}>
+            <X size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* Vendors / Brands */}
+      {vendors && vendors.length > 0 && (
+        <div>
+          <h4 className="font-display text-sm mb-3">Brend</h4>
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {vendors.sort().map((vendor) => (
+              <label key={vendor} className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  checked={selectedVendors.includes(vendor)}
+                  onCheckedChange={() => toggleFilter(vendor, selectedVendors, setSelectedVendors)}
+                />
+                <span className="font-body text-sm">{vendor}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Gender */}
+      <div>
+        <h4 className="font-display text-sm mb-3">Spol</h4>
+        <div className="space-y-2">
+          {['men', 'women', 'unisex'].map((gender) => (
+            <label key={gender} className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
+                checked={selectedGenders.includes(gender)}
+                onCheckedChange={() => toggleFilter(gender, selectedGenders, setSelectedGenders)}
+              />
+              <span className="font-body text-sm">
+                {gender === 'men' ? 'Muški' : gender === 'women' ? 'Ženski' : 'Unisex'}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Fragrance Type */}
+      {filterOptions.fragranceTypes.length > 0 && (
+        <div>
+          <h4 className="font-display text-sm mb-3">Tip parfema</h4>
+          <div className="space-y-2">
+            {filterOptions.fragranceTypes.map((type) => (
+              <label key={type} className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  checked={selectedFragranceTypes.includes(type)}
+                  onCheckedChange={() => toggleFilter(type, selectedFragranceTypes, setSelectedFragranceTypes)}
+                />
+                <span className="font-body text-sm">{type}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Sizes */}
+      {filterOptions.sizes.length > 0 && (
+        <div>
+          <h4 className="font-display text-sm mb-3">Veličina</h4>
+          <div className="flex flex-wrap gap-2">
+            {filterOptions.sizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => toggleFilter(size, selectedSizes, setSelectedSizes)}
+                className={`px-3 py-1 text-sm font-body border transition-colors ${
+                  selectedSizes.includes(size)
+                    ? 'bg-foreground text-background border-foreground'
+                    : 'border-border hover:border-foreground'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Price Range */}
+      <div>
+        <h4 className="font-display text-sm mb-3">Cijena</h4>
+        <div className="px-2">
+          <Slider
+            value={priceRange}
+            onValueChange={(value) => setPriceRange(value as [number, number])}
+            max={filterOptions.maxPrice}
+            min={0}
+            step={10}
+            className="mb-3"
+          />
+          <div className="flex justify-between font-body text-sm text-muted-foreground">
+            <span>€{priceRange[0]}</span>
+            <span>€{priceRange[1]}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Reset Button */}
+      {activeFilterCount > 0 && (
+        <button
+          onClick={handleReset}
+          className="w-full py-2 font-body text-sm text-accent hover:text-accent/80 transition-colors"
+        >
+          Resetiraj filtere ({activeFilterCount})
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <Layout>
@@ -151,47 +338,11 @@ const Collection = () => {
       <section className="py-12 md:py-16 border-b border-border">
         <div className="container-montis">
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-wide text-center">
-            {currentCollection ? currentCollection.name : "Kolekcija"}
+            {getPageTitle()}
           </h1>
-          {currentCollection && (
-            <p className="font-body text-muted-foreground text-center mt-3">
-              {currentCollection.description}
-            </p>
-          )}
           <p className="font-body text-muted-foreground text-center mt-2">
-            {sortedProducts.length} proizvoda
+            {isLoading ? 'Učitavanje...' : `${filteredProducts.length} proizvoda`}
           </p>
-        </div>
-      </section>
-
-      {/* Collection Quick Filters */}
-      <section className="border-b border-border">
-        <div className="container-montis py-4 overflow-x-auto">
-          <div className="flex gap-2 min-w-max">
-            <button
-              onClick={() => handleFilterChange("collection", "")}
-              className={`px-4 py-2 font-body text-sm tracking-wide transition-colors ${
-                !selectedFilters.collection
-                  ? "bg-foreground text-background"
-                  : "bg-transparent text-muted-foreground hover:text-foreground border border-border"
-              }`}
-            >
-              Sve
-            </button>
-            {collections.map((collection) => (
-              <button
-                key={collection.id}
-                onClick={() => handleFilterChange("collection", collection.slug)}
-                className={`px-4 py-2 font-body text-sm tracking-wide transition-colors ${
-                  selectedFilters.collection === collection.slug
-                    ? "bg-foreground text-background"
-                    : "bg-transparent text-muted-foreground hover:text-foreground border border-border"
-                }`}
-              >
-                {collection.name}
-              </button>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -213,43 +364,36 @@ const Collection = () => {
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="w-full max-w-sm p-0 bg-background">
-                <FilterSidebar
-                  filters={filterOptions}
-                  selectedFilters={selectedFilters}
-                  onFilterChange={handleFilterChange}
-                  onReset={handleReset}
-                  isMobile
-                  onClose={() => setIsMobileFilterOpen(false)}
-                />
+                <FilterContent isMobile />
               </SheetContent>
             </Sheet>
 
             {/* Active Filters Pills - Desktop */}
             <div className="hidden lg:flex items-center gap-2 flex-wrap">
-              {selectedFilters.brands.map((brand) => (
+              {selectedVendors.map((vendor) => (
                 <button
-                  key={brand}
-                  onClick={() => handleFilterChange("brands", brand)}
+                  key={vendor}
+                  onClick={() => toggleFilter(vendor, selectedVendors, setSelectedVendors)}
                   className="flex items-center gap-1 px-3 py-1 bg-foreground text-background font-body text-xs"
                 >
-                  {brand}
+                  {vendor}
                   <X size={12} />
                 </button>
               ))}
-              {selectedFilters.genders.map((gender) => (
+              {selectedGenders.map((gender) => (
                 <button
                   key={gender}
-                  onClick={() => handleFilterChange("genders", gender)}
+                  onClick={() => toggleFilter(gender, selectedGenders, setSelectedGenders)}
                   className="flex items-center gap-1 px-3 py-1 bg-foreground text-background font-body text-xs"
                 >
-                  {gender}
+                  {gender === 'men' ? 'Muški' : gender === 'women' ? 'Ženski' : 'Unisex'}
                   <X size={12} />
                 </button>
               ))}
-              {selectedFilters.types.map((type) => (
+              {selectedFragranceTypes.map((type) => (
                 <button
                   key={type}
-                  onClick={() => handleFilterChange("types", type)}
+                  onClick={() => toggleFilter(type, selectedFragranceTypes, setSelectedFragranceTypes)}
                   className="flex items-center gap-1 px-3 py-1 bg-foreground text-background font-body text-xs"
                 >
                   {type}
@@ -259,7 +403,18 @@ const Collection = () => {
             </div>
 
             {/* Sort */}
-            <SortDropdown value={sortBy} onChange={setSortBy} />
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+              <SelectTrigger className="w-[180px] bg-background">
+                <SelectValue placeholder="Sortiraj" />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                <SelectItem value="bestselling">Najprodavanije</SelectItem>
+                <SelectItem value="newest">Najnovije</SelectItem>
+                <SelectItem value="price-asc">Cijena: niža prvo</SelectItem>
+                <SelectItem value="price-desc">Cijena: viša prvo</SelectItem>
+                <SelectItem value="title">Naziv</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </section>
@@ -271,18 +426,17 @@ const Collection = () => {
             {/* Sidebar - Desktop */}
             <div className="hidden lg:block w-64 flex-shrink-0">
               <div className="sticky top-40">
-                <FilterSidebar
-                  filters={filterOptions}
-                  selectedFilters={selectedFilters}
-                  onFilterChange={handleFilterChange}
-                  onReset={handleReset}
-                />
+                <FilterContent />
               </div>
             </div>
 
             {/* Product Grid */}
             <div className="flex-1">
-              {sortedProducts.length === 0 ? (
+              {isLoading ? (
+                <div className="flex justify-center py-16">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="font-display text-xl text-muted-foreground mb-4">
                     Nema proizvoda koji odgovaraju vašim filterima
@@ -291,13 +445,13 @@ const Collection = () => {
                     onClick={handleReset}
                     className="font-body text-sm text-accent hover:text-accent/80 transition-colors"
                   >
-                    Resetuj filtere
+                    Resetiraj filtere
                   </button>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {sortedProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                  {filteredProducts.map((product) => (
+                    <ShopifyProductCard key={product.node.id} product={product} />
                   ))}
                 </div>
               )}
