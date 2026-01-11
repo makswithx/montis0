@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Search, ShoppingBag, Menu, X } from "lucide-react";
-import logoTekst from "@/assets/logo-tekst.svg";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,9 +43,9 @@ const Header = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2"
+            className="font-display text-2xl md:text-3xl tracking-[0.15em] text-foreground absolute left-1/2 -translate-x-1/2"
           >
-            <img src={logoTekst} alt="Montis" className="h-6 md:h-8 w-auto" />
+            Montis
           </Link>
 
           {/* Right Actions */}
