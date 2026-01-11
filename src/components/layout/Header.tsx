@@ -1,17 +1,31 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, ChevronDown } from "lucide-react";
 import montisIkona from "@/assets/montis-ikona.png";
 import CartDrawer from "@/components/cart/CartDrawer";
+import { useVendors } from "@/hooks/useShopifyProducts";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
+  const { data: vendors } = useVendors();
 
-  const navLinks = [
+  const mainNavLinks = [
     { href: "/", label: "Početna" },
-    { href: "/kolekcija", label: "Kolekcija" },
+    { href: "/kolekcija", label: "Svi parfemi" },
+  ];
+
+  const genderLinks = [
+    { href: "/kolekcija?gender=men", label: "Muški parfemi" },
+    { href: "/kolekcija?gender=women", label: "Ženski parfemi" },
+    { href: "/kolekcija?gender=unisex", label: "Unisex parfemi" },
   ];
 
   return (
@@ -21,15 +35,15 @@ const Header = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 -ml-2"
+            className="lg:hidden p-2 -ml-2"
             aria-label="Meni"
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
           {/* Navigation - Desktop */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+          <nav className="hidden lg:flex items-center gap-6">
+            {mainNavLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
@@ -40,6 +54,43 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
+
+            {/* Gender Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="nav-link flex items-center gap-1">
+                Kategorije <ChevronDown size={14} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-background border border-border min-w-[180px]">
+                {genderLinks.map((link) => (
+                  <DropdownMenuItem key={link.href} asChild>
+                    <Link to={link.href} className="w-full cursor-pointer">
+                      {link.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Brands Dropdown */}
+            {vendors && vendors.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="nav-link flex items-center gap-1">
+                  Brendovi <ChevronDown size={14} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-background border border-border min-w-[200px] max-h-[400px] overflow-y-auto">
+                  {vendors.sort().map((vendor) => (
+                    <DropdownMenuItem key={vendor} asChild>
+                      <Link 
+                        to={`/kolekcija?vendor=${encodeURIComponent(vendor)}`} 
+                        className="w-full cursor-pointer"
+                      >
+                        {vendor}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </nav>
 
           {/* Logo */}
@@ -79,20 +130,59 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-background border-t border-border/50 animate-fade-in">
-          <nav className="container-montis py-6 flex flex-col gap-4">
-            {navLinks.map((link) => (
+        <div className="lg:hidden bg-background border-t border-border/50 animate-fade-in">
+          <nav className="container-montis py-6 flex flex-col gap-1">
+            {mainNavLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`nav-link py-2 ${
+                className={`nav-link py-3 ${
                   location.pathname === link.href ? "text-foreground" : ""
                 }`}
               >
                 {link.label}
               </Link>
             ))}
+            
+            <div className="border-t border-border/30 my-2" />
+            <p className="text-xs text-muted-foreground uppercase tracking-wider py-2">Kategorije</p>
+            {genderLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                onClick={() => setIsMenuOpen(false)}
+                className="nav-link py-3 pl-2"
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {vendors && vendors.length > 0 && (
+              <>
+                <div className="border-t border-border/30 my-2" />
+                <p className="text-xs text-muted-foreground uppercase tracking-wider py-2">Brendovi</p>
+                {vendors.sort().slice(0, 10).map((vendor) => (
+                  <Link
+                    key={vendor}
+                    to={`/kolekcija?vendor=${encodeURIComponent(vendor)}`}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="nav-link py-3 pl-2"
+                  >
+                    {vendor}
+                  </Link>
+                ))}
+                {vendors.length > 10 && (
+                  <Link
+                    to="/kolekcija"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="nav-link py-3 pl-2 text-accent"
+                  >
+                    Svi brendovi →
+                  </Link>
+                )}
+              </>
+            )}
           </nav>
         </div>
       )}

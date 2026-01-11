@@ -1,14 +1,54 @@
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import ProductCard from "@/components/product/ProductCard";
+import ShopifyProductCard from "@/components/product/ShopifyProductCard";
 import { Button } from "@/components/ui/button";
-import { products, collections } from "@/data/products";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import VideoHero from "@/components/home/VideoHero";
+import { useBestsellers, useNewArrivals, useSignatureCollection, useSeasonalCollection } from "@/hooks/useShopifyProducts";
 
 const Index = () => {
-  const featuredProducts = products.filter(p => p.collection === "bestsellers").slice(0, 4);
-  const newProducts = products.filter(p => p.collection === "new").slice(0, 4);
+  const { data: bestsellers, isLoading: loadingBestsellers } = useBestsellers(4);
+  const { data: newArrivals, isLoading: loadingNew } = useNewArrivals(4);
+  const { data: signatureProducts } = useSignatureCollection(4);
+  const { data: summerProducts } = useSeasonalCollection('summer', 4);
+
+  // Dynamic collections based on available data
+  const collections = [
+    {
+      id: "bestsellers",
+      name: "Najprodavanije",
+      slug: "bestsellers",
+      description: "Najpopularniji parfemi koje naši kupci obožavaju",
+      image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&h=600&fit=crop",
+      link: "/kolekcija?sort=bestselling",
+    },
+    {
+      id: "new",
+      name: "Novo u ponudi",
+      slug: "new",
+      description: "Najnoviji dodaci našoj ekskluzivnoj kolekciji",
+      image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&h=600&fit=crop",
+      link: "/kolekcija?sort=newest",
+    },
+    {
+      id: "signature",
+      name: "Signature kolekcija",
+      slug: "signature",
+      description: "Ikonični mirisi koji definiraju luksuz",
+      image: "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?w=800&h=600&fit=crop",
+      link: "/kolekcija?collection=signature",
+    },
+    {
+      id: "summer",
+      name: "Ljetna kolekcija",
+      slug: "summer",
+      description: "Svježi i lagani mirisi za tople dane",
+      image: "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=800&h=600&fit=crop",
+      link: "/kolekcija?season=summer",
+    },
+  ];
+
+  const hasProducts = bestsellers && bestsellers.length > 0;
 
   return (
     <Layout>
@@ -29,7 +69,7 @@ const Index = () => {
             {collections.map((collection) => (
               <Link
                 key={collection.id}
-                to={`/kolekcija?collection=${collection.slug}`}
+                to={collection.link}
                 className="relative aspect-[4/5] group overflow-hidden"
               >
                 <img
@@ -63,7 +103,7 @@ const Index = () => {
               </h2>
             </div>
             <Link
-              to="/kolekcija?collection=bestsellers"
+              to="/kolekcija?sort=bestselling"
               className="nav-link flex items-center gap-2"
             >
               Pogledaj sve
@@ -71,11 +111,26 @@ const Index = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loadingBestsellers ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : hasProducts ? (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+              {bestsellers.map((product) => (
+                <ShopifyProductCard key={product.node.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-muted/30 rounded-lg">
+              <p className="font-body text-muted-foreground mb-4">
+                Trenutno nema proizvoda u ponudi.
+              </p>
+              <p className="font-body text-sm text-muted-foreground">
+                Dodajte proizvode u Shopify Admin da bi se prikazali ovdje.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -90,7 +145,7 @@ const Index = () => {
               </h2>
             </div>
             <Link
-              to="/kolekcija?collection=new"
+              to="/kolekcija?sort=newest"
               className="nav-link flex items-center gap-2"
             >
               Pogledaj sve
@@ -98,11 +153,23 @@ const Index = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {newProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loadingNew ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : newArrivals && newArrivals.length > 0 ? (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+              {newArrivals.map((product) => (
+                <ShopifyProductCard key={product.node.id} product={product} />
+              ))}
+            </div>
+          ) : hasProducts ? null : (
+            <div className="text-center py-12 bg-muted/30 rounded-lg">
+              <p className="font-body text-muted-foreground">
+                Uskoro nove kolekcije.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -120,21 +187,18 @@ const Index = () => {
             {[
               {
                 title: "Za njega",
-                count: products.filter(p => p.gender === "Muški").length,
                 image: "https://images.unsplash.com/photo-1547887538-047f814bfb64?w=600&h=800&fit=crop",
-                link: "/kolekcija?gender=Muški",
+                link: "/kolekcija?gender=men",
               },
               {
                 title: "Za nju",
-                count: products.filter(p => p.gender === "Ženski").length,
                 image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=800&fit=crop",
-                link: "/kolekcija?gender=Ženski",
+                link: "/kolekcija?gender=women",
               },
               {
                 title: "Unisex",
-                count: products.filter(p => p.gender === "Unisex").length,
                 image: "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?w=600&h=800&fit=crop",
-                link: "/kolekcija?gender=Unisex",
+                link: "/kolekcija?gender=unisex",
               },
             ].map((category) => (
               <Link
@@ -152,9 +216,6 @@ const Index = () => {
                   <h3 className="font-display text-2xl md:text-3xl text-bone-light tracking-wide">
                     {category.title}
                   </h3>
-                  <p className="font-body text-sm text-bone-light/70 mt-1">
-                    {category.count} proizvoda
-                  </p>
                   <span className="font-body text-sm text-bone-light/80 tracking-widest uppercase mt-3 flex items-center gap-2 group-hover:gap-3 transition-all">
                     Istražite
                     <ArrowRight size={14} />
