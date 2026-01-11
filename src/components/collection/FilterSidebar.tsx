@@ -156,7 +156,7 @@ const FilterSidebar = ({
             <Slider
               min={filters.priceRange[0]}
               max={filters.priceRange[1]}
-              step={10}
+              step={1}
               value={selectedFilters.priceRange}
               onValueChange={(value) => onFilterChange("priceRange", value as [number, number])}
               className="w-full"
