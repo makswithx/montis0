@@ -79,7 +79,7 @@ export function useSeasonalCollection(season: string, count: number = 8) {
   });
 }
 
-// Fetch products by gender
+// Fetch products by gender (uses tag: gender_*)
 export function useProductsByGender(gender: string, count: number = 50) {
   return useQuery<ShopifyProduct[]>({
     queryKey: ["shopify-gender", gender, count],
