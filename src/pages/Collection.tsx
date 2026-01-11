@@ -149,7 +149,7 @@ const Collection = () => {
     <Layout>
       {/* Page Header */}
       <section className="py-12 md:py-16 border-b border-border">
-        <div className="container-eleya">
+        <div className="container-montis">
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-wide text-center">
             {currentCollection ? currentCollection.name : "Kolekcija"}
           </h1>
@@ -166,7 +166,7 @@ const Collection = () => {
 
       {/* Collection Quick Filters */}
       <section className="border-b border-border">
-        <div className="container-eleya py-4 overflow-x-auto">
+        <div className="container-montis py-4 overflow-x-auto">
           <div className="flex gap-2 min-w-max">
             <button
               onClick={() => handleFilterChange("collection", "")}
@@ -197,7 +197,7 @@ const Collection = () => {
 
       {/* Toolbar */}
       <section className="sticky top-16 md:top-20 z-30 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="container-eleya py-4">
+        <div className="container-montis py-4">
           <div className="flex items-center justify-between">
             {/* Mobile Filter Toggle */}
             <Sheet open={isMobileFilterOpen} onOpenChange={setIsMobileFilterOpen}>
@@ -266,7 +266,7 @@ const Collection = () => {
 
       {/* Main Content */}
       <section className="py-8 md:py-12">
-        <div className="container-eleya">
+        <div className="container-montis">
           <div className="flex gap-12">
             {/* Sidebar - Desktop */}
             <div className="hidden lg:block w-64 flex-shrink-0">

@@ -2,11 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+/* 
+ * MONTIS Brand Typography
+ * 
+ * Primary: Canela (commercial font - requires license)
+ * Add Canela font files to /public/fonts/ when available:
+ * - Canela-Light.woff2
+ * - Canela-Regular.woff2  
+ * - Canela-Medium.woff2
+ *
+ * Fallback: Playfair Display (Google Fonts - similar elegant serif)
+ */
+@font-face {
+  font-family: 'Canela';
+  src: url('/fonts/Canela-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Canela';
+  src: url('/fonts/Canela-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Canela';
+  src: url('/fonts/Canela-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
 
 @layer base {
   :root {
-    /* ELEYA Brand Colors */
+    /* MONTIS Brand Colors */
     --background: 40 14% 90%; /* Ash Bone #E2DED7 */
     --foreground: 240 6% 3%; /* Deep Obsidian #0B0B0C */
 
@@ -37,7 +72,7 @@
 
     --radius: 0px;
 
-    /* Custom ELEYA tokens */
+    /* MONTIS Custom Tokens */
     --gold: 37 52% 43%;
     --gold-light: 37 52% 55%;
     --stone: 37 6% 64%;
@@ -46,8 +81,9 @@
     --bone: 40 14% 90%;
     --bone-light: 40 14% 95%;
 
-    /* Typography */
-    --font-display: 'Cormorant Garamond', Georgia, serif;
+    /* Typography - Montis Brand Fonts */
+    /* Canela with Playfair Display fallback */
+    --font-display: 'Canela', 'Playfair Display', Georgia, serif;
     --font-body: 'Inter', system-ui, sans-serif;
 
     /* Transitions */
@@ -97,7 +133,7 @@
 }
 
 @layer components {
-  .container-eleya {
+  .container-montis {
     @apply w-full max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8;
   }
 

@@ -3,16 +3,15 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <footer className="bg-foreground text-background py-16 mt-20">
-      <div className="container-eleya">
+      <div className="container-montis">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="/" className="font-display text-3xl tracking-[0.15em]">
-              ELEYA
+              Montis
             </Link>
             <p className="mt-4 font-body text-sm text-background/70 max-w-sm leading-relaxed">
-              Vaša destinacija za ekskluzivne parfeme. Više od 3.500 originalnih mirisa 
-              iz cijeloga svijeta.
+              Mjesto iznad sumnje. Pažljivo odabrani luksuzni parfemi s provjerenom autentičnošću.
             </p>
           </div>
 
