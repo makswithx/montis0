@@ -150,48 +150,38 @@ const FilterSidebar = ({
             ))}
           </div>
 
-          {/* Native Range Inputs */}
-          <div className="pt-2 space-y-4">
-            <div className="relative h-6">
+          {/* Price Inputs */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
               <input
-                type="range"
+                type="number"
                 min={filters.priceRange[0]}
-                max={filters.priceRange[1]}
+                max={selectedFilters.priceRange[1]}
                 value={selectedFilters.priceRange[0]}
                 onChange={(e) => {
-                  const newMin = Math.min(Number(e.target.value), selectedFilters.priceRange[1] - 10);
-                  onFilterChange("priceRange", [newMin, selectedFilters.priceRange[1]]);
+                  const val = Math.max(filters.priceRange[0], Math.min(Number(e.target.value), selectedFilters.priceRange[1]));
+                  onFilterChange("priceRange", [val, selectedFilters.priceRange[1]]);
                 }}
-                className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-background [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-foreground [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing"
-                style={{ top: '50%', transform: 'translateY(-50%)' }}
+                className="w-full px-3 py-2 border border-border bg-background font-body text-sm focus:outline-none focus:border-foreground"
+                placeholder="Min"
               />
+            </div>
+            <span className="font-body text-muted-foreground">—</span>
+            <div className="flex-1">
               <input
-                type="range"
-                min={filters.priceRange[0]}
+                type="number"
+                min={selectedFilters.priceRange[0]}
                 max={filters.priceRange[1]}
                 value={selectedFilters.priceRange[1]}
                 onChange={(e) => {
-                  const newMax = Math.max(Number(e.target.value), selectedFilters.priceRange[0] + 10);
-                  onFilterChange("priceRange", [selectedFilters.priceRange[0], newMax]);
+                  const val = Math.max(selectedFilters.priceRange[0], Math.min(Number(e.target.value), filters.priceRange[1]));
+                  onFilterChange("priceRange", [selectedFilters.priceRange[0], val]);
                 }}
-                className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-background [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-foreground [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing"
-                style={{ top: '50%', transform: 'translateY(-50%)' }}
-              />
-              {/* Track background */}
-              <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 bg-border rounded-full" />
-              {/* Active range */}
-              <div 
-                className="absolute top-1/2 -translate-y-1/2 h-1.5 bg-foreground rounded-full"
-                style={{
-                  left: `${((selectedFilters.priceRange[0] - filters.priceRange[0]) / (filters.priceRange[1] - filters.priceRange[0])) * 100}%`,
-                  right: `${100 - ((selectedFilters.priceRange[1] - filters.priceRange[0]) / (filters.priceRange[1] - filters.priceRange[0])) * 100}%`
-                }}
+                className="w-full px-3 py-2 border border-border bg-background font-body text-sm focus:outline-none focus:border-foreground"
+                placeholder="Max"
               />
             </div>
-            <div className="flex justify-between font-body text-xs text-muted-foreground">
-              <span>€{selectedFilters.priceRange[0]}</span>
-              <span>€{selectedFilters.priceRange[1]}</span>
-            </div>
+            <span className="font-body text-sm text-muted-foreground">€</span>
           </div>
         </div>
       </FilterSection>
