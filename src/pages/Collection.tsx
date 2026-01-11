@@ -121,8 +121,8 @@ const Collection = () => {
         if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
         return a.localeCompare(b);
       }),
-      // Static fragrance types - these are known values
-      fragranceTypes: ['EDP', 'EDT', 'Parfum', 'Extrait'],
+      // Static fragrance types - lowercase to match tag format (type_edp, type_edt, etc.)
+      fragranceTypes: ['edp', 'edt', 'parfum', 'extrait'],
       maxPrice: Math.ceil(maxPrice / 100) * 100 || 1000,
     };
   }, [products]);
@@ -264,7 +264,7 @@ const Collection = () => {
                   checked={selectedFragranceTypes.includes(type)}
                   onCheckedChange={() => toggleFilter(type, selectedFragranceTypes, setSelectedFragranceTypes)}
                 />
-                <span className="font-body text-sm">{type}</span>
+                <span className="font-body text-sm uppercase">{type}</span>
               </label>
             ))}
           </div>
