@@ -32,7 +32,7 @@ const Footer = () => {
           <div>
             <h4 className="font-display text-lg tracking-wide mb-4">Kontakt</h4>
             <div className="flex flex-col gap-2 font-body text-sm text-background/70">
-              <p>info@eleya.me</p>
+              <p>montis.parfumerija@gmail.com</p>
               <p>+382 XX XXX XXX</p>
               <p>Podgorica, Crna Gora</p>
             </div>

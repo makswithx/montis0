@@ -92,18 +92,18 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Bestsellers */}
+      {/* Featured Products */}
       <section className="pb-20 md:pb-28">
         <div className="container-montis">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <p className="brand-name mb-2">Izdvajamo</p>
+              <p className="brand-name mb-2">Iz ponude</p>
               <h2 className="font-display text-2xl md:text-3xl tracking-wide">
-                Najprodavanije
+                Izdvojeni parfemi
               </h2>
             </div>
             <Link
-              to="/kolekcija?sort=bestselling"
+              to="/kolekcija"
               className="nav-link flex items-center gap-2"
             >
               Pogledaj sve
@@ -134,52 +134,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* New Arrivals */}
-      <section className="pb-20 md:pb-28">
-        <div className="container-montis">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <p className="brand-name mb-2">Svježe</p>
-              <h2 className="font-display text-2xl md:text-3xl tracking-wide">
-                Novo u ponudi
-              </h2>
-            </div>
-            <Link
-              to="/kolekcija?sort=newest"
-              className="nav-link flex items-center gap-2"
-            >
-              Pogledaj sve
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-
-          {loadingNew ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : newArrivals && newArrivals.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-              {newArrivals.map((product) => (
-                <ShopifyProductCard key={product.node.id} product={product} />
-              ))}
-            </div>
-          ) : hasProducts ? null : (
-            <div className="text-center py-12 bg-muted/30 rounded-lg">
-              <p className="font-body text-muted-foreground">
-                Uskoro nove kolekcije.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* Categories */}
       <section className="pb-20 md:pb-28">
         <div className="container-montis">
           <div className="text-center mb-12">
-            <p className="brand-name mb-3">Pretražite po</p>
             <h2 className="font-display text-3xl md:text-4xl tracking-wide">
-              Kategoriji
+              Pretražite po kategoriji
             </h2>
           </div>
 

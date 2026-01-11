@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, Menu, X, ChevronDown } from "lucide-react";
 import montisIkona from "@/assets/montis-ikona.png";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -15,7 +15,13 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: vendors } = useVendors();
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname, location.search]);
 
   const mainNavLinks = [
     { href: "/", label: "Početna" },
@@ -27,6 +33,12 @@ const Header = () => {
     { href: "/kolekcija?gender=women", label: "Ženski parfemi" },
     { href: "/kolekcija?gender=unisex", label: "Unisex parfemi" },
   ];
+
+  // Handle navigation with scroll to top (for dropdown links)
+  const handleNavigate = (href: string) => {
+    navigate(href);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
@@ -62,10 +74,12 @@ const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-background border border-border min-w-[180px]">
                 {genderLinks.map((link) => (
-                  <DropdownMenuItem key={link.href} asChild>
-                    <Link to={link.href} className="w-full cursor-pointer">
-                      {link.label}
-                    </Link>
+                  <DropdownMenuItem 
+                    key={link.href} 
+                    onClick={() => handleNavigate(link.href)}
+                    className="w-full cursor-pointer"
+                  >
+                    {link.label}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -79,13 +93,12 @@ const Header = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-background border border-border min-w-[200px] max-h-[400px] overflow-y-auto">
                   {vendors.sort().map((vendor) => (
-                    <DropdownMenuItem key={vendor} asChild>
-                      <Link 
-                        to={`/kolekcija?vendor=${encodeURIComponent(vendor)}`} 
-                        className="w-full cursor-pointer"
-                      >
-                        {vendor}
-                      </Link>
+                    <DropdownMenuItem 
+                      key={vendor} 
+                      onClick={() => handleNavigate(`/kolekcija?vendor=${encodeURIComponent(vendor)}`)}
+                      className="w-full cursor-pointer"
+                    >
+                      {vendor}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
