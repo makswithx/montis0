@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Search, ShoppingBag, Menu, X } from "lucide-react";
-import montisIcon from "@/assets/montis-icon.png";
+import logoRijec from "@/assets/logo-rijec.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -46,7 +46,7 @@ const Header = () => {
             to="/"
             className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2"
           >
-            <img src={montisIcon} alt="Montis" className="h-8 md:h-10 w-auto" />
+            <img src={logoRijec} alt="Montis" className="h-6 md:h-8 w-auto" />
           </Link>
 
           {/* Right Actions */}
