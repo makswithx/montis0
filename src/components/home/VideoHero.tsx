@@ -77,19 +77,19 @@ const VideoHero = () => {
           }`}
         >
           <Link 
-            to="/collection" 
+            to="/kolekcija" 
             className="group relative inline-flex items-center justify-center gap-3 px-10 py-4 bg-gold text-obsidian font-medium tracking-widest uppercase text-sm overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(212,175,55,0.5)]"
           >
-            <span className="relative z-10">Istraži</span>
+            <span className="relative z-10">Istraži kolekciju</span>
             <ArrowRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
             <div className="absolute inset-0 bg-bone transform scale-x-0 origin-left transition-transform duration-500 group-hover:scale-x-100" />
           </Link>
           
           <Link 
-            to="/collection?category=new" 
+            to="/kolekcija?sort=newest" 
             className="group inline-flex items-center justify-center gap-3 px-10 py-4 border border-bone/40 text-bone font-medium tracking-widest uppercase text-sm transition-all duration-500 hover:border-gold hover:text-gold backdrop-blur-sm"
           >
-            <span>Noviteti</span>
+            <span>Novo u ponudi</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
