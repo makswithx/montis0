@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import montisIkona from "@/assets/montis-ikona.png";
+import CartDrawer from "@/components/cart/CartDrawer";
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -50,20 +52,15 @@ const Header = () => {
           </Link>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="p-2"
+              className="p-2 hover:opacity-70 transition-opacity"
               aria-label="Pretraga"
             >
               <Search size={20} />
             </button>
-            <button className="p-2 relative" aria-label="Korpa">
-              <ShoppingBag size={20} />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent text-accent-foreground text-[10px] flex items-center justify-center">
-                0
-              </span>
-            </button>
+            <CartDrawer />
           </div>
         </div>
 
