@@ -46,7 +46,7 @@ const Header = () => {
             to="/"
             className="absolute left-1/2 -translate-x-1/2"
           >
-            <img src={montisIkona} alt="Montis" className="h-10 md:h-12 w-auto" />
+            <img src={montisIkona} alt="Montis" className="h-12 md:h-16 w-auto" />
           </Link>
 
           {/* Right Actions */}
