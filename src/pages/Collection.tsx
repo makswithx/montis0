@@ -4,8 +4,8 @@ import Layout from "@/components/layout/Layout";
 import ShopifyProductCard from "@/components/product/ShopifyProductCard";
 import { SlidersHorizontal, X, Loader2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAllProducts, useVendors } from "@/hooks/useShopifyProducts";
-import { ShopifyProduct, getMetafieldValue, getProductSizes } from "@/lib/shopify";
+import { useShopifyProducts, useVendors } from "@/hooks/useShopifyProducts";
+import { ShopifyProduct, getProductSizes, ProductFilters } from "@/lib/shopify";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -37,25 +37,77 @@ const Collection = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState<SortOption>(initialSort);
 
-  // Fetch all products and vendors
-  const { data: products, isLoading } = useAllProducts(100);
+  // Build server-side filters
+  const serverFilters = useMemo((): ProductFilters => {
+    const filters: ProductFilters = {};
+    
+    // Gender filter via tags
+    if (selectedGenders.length > 0) {
+      filters.genders = selectedGenders;
+    } else if (initialGender) {
+      filters.genders = [initialGender];
+    }
+    
+    // Vendor filter
+    if (selectedVendors.length === 1) {
+      filters.vendor = selectedVendors[0];
+    } else if (initialVendor) {
+      filters.vendor = initialVendor;
+    }
+    
+    // Fragrance type via tags
+    if (selectedFragranceTypes.length > 0) {
+      filters.fragranceTypes = selectedFragranceTypes;
+    }
+    
+    // Signature collection via tag
+    if (initialCollection === 'signature') {
+      filters.isSignature = true;
+    }
+    
+    // Season via tag
+    if (initialSeason) {
+      filters.season = initialSeason;
+    }
+    
+    // Sorting
+    switch (sortBy) {
+      case 'bestselling':
+        filters.sortKey = 'BEST_SELLING';
+        break;
+      case 'newest':
+        filters.sortKey = 'CREATED_AT';
+        filters.reverse = true;
+        break;
+      case 'price-asc':
+        filters.sortKey = 'PRICE';
+        break;
+      case 'price-desc':
+        filters.sortKey = 'PRICE';
+        filters.reverse = true;
+        break;
+      case 'title':
+        filters.sortKey = 'TITLE';
+        break;
+    }
+    
+    return filters;
+  }, [selectedGenders, selectedVendors, selectedFragranceTypes, initialGender, initialVendor, initialCollection, initialSeason, sortBy]);
+
+  // Fetch products with server-side filters (scales to 3-5k products)
+  const { data: products, isLoading } = useShopifyProducts(100, serverFilters);
   const { data: vendors } = useVendors();
 
-  // Extract unique values from products
+  // Extract unique sizes and max price from products (these need client-side extraction)
   const filterOptions = useMemo(() => {
     if (!products) return { sizes: [], fragranceTypes: [], maxPrice: 1000 };
 
     const sizes = new Set<string>();
-    const fragranceTypes = new Set<string>();
     let maxPrice = 0;
 
     products.forEach((p) => {
       // Sizes from variants
       getProductSizes(p.node).forEach(size => sizes.add(size));
-      
-      // Fragrance type from metafield
-      const type = getMetafieldValue<string>(p.node.fragranceType);
-      if (type) fragranceTypes.add(type);
       
       // Max price
       const price = parseFloat(p.node.priceRange.maxVariantPrice.amount);
@@ -69,8 +121,9 @@ const Collection = () => {
         if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
         return a.localeCompare(b);
       }),
-      fragranceTypes: Array.from(fragranceTypes).sort(),
-      maxPrice: Math.ceil(maxPrice / 100) * 100,
+      // Static fragrance types - these are known values
+      fragranceTypes: ['EDP', 'EDT', 'Parfum', 'Extrait'],
+      maxPrice: Math.ceil(maxPrice / 100) * 100 || 1000,
     };
   }, [products]);
 
@@ -81,35 +134,14 @@ const Collection = () => {
     }
   }, [filterOptions.maxPrice]);
 
-  // Filter and sort products
+  // Client-side filtering only for size and price (these can't be done server-side efficiently)
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
     let filtered = products.filter((p) => {
       const node = p.node;
 
-      // Vendor filter
-      if (selectedVendors.length > 0 && !selectedVendors.includes(node.vendor)) {
-        return false;
-      }
-
-      // Gender filter (from metafield)
-      if (selectedGenders.length > 0) {
-        const gender = getMetafieldValue<string>(node.gender);
-        if (!gender || !selectedGenders.includes(gender)) {
-          return false;
-        }
-      }
-
-      // Fragrance type filter
-      if (selectedFragranceTypes.length > 0) {
-        const type = getMetafieldValue<string>(node.fragranceType);
-        if (!type || !selectedFragranceTypes.includes(type)) {
-          return false;
-        }
-      }
-
-      // Size filter
+      // Size filter (client-side - variant-based)
       if (selectedSizes.length > 0) {
         const productSizes = getProductSizes(node);
         if (!productSizes.some(size => selectedSizes.includes(size))) {
@@ -117,19 +149,7 @@ const Collection = () => {
         }
       }
 
-      // Signature collection filter
-      if (initialCollection === 'signature') {
-        const isSignature = getMetafieldValue<boolean>(node.isSignature);
-        if (!isSignature) return false;
-      }
-
-      // Season filter
-      if (initialSeason) {
-        const season = getMetafieldValue<string>(node.season);
-        if (season !== initialSeason) return false;
-      }
-
-      // Price filter
+      // Price filter (client-side for precise range)
       const price = parseFloat(node.priceRange.minVariantPrice.amount);
       if (price < priceRange[0] || price > priceRange[1]) {
         return false;
@@ -138,36 +158,8 @@ const Collection = () => {
       return true;
     });
 
-    // Sort
-    switch (sortBy) {
-      case "newest":
-        filtered.sort((a, b) => 
-          new Date(b.node.createdAt).getTime() - new Date(a.node.createdAt).getTime()
-        );
-        break;
-      case "price-asc":
-        filtered.sort((a, b) => 
-          parseFloat(a.node.priceRange.minVariantPrice.amount) - 
-          parseFloat(b.node.priceRange.minVariantPrice.amount)
-        );
-        break;
-      case "price-desc":
-        filtered.sort((a, b) => 
-          parseFloat(b.node.priceRange.minVariantPrice.amount) - 
-          parseFloat(a.node.priceRange.minVariantPrice.amount)
-        );
-        break;
-      case "title":
-        filtered.sort((a, b) => a.node.title.localeCompare(b.node.title));
-        break;
-      case "bestselling":
-      default:
-        // Shopify default order is already by bestselling when no sort specified
-        break;
-    }
-
     return filtered;
-  }, [products, selectedVendors, selectedGenders, selectedFragranceTypes, selectedSizes, priceRange, sortBy, initialCollection, initialSeason]);
+  }, [products, selectedSizes, priceRange]);
 
   // Update URL when filters change
   useEffect(() => {

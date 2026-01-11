@@ -83,18 +83,23 @@ export interface ShopifyProduct {
   };
 }
 
-// Filter types
+// Filter types - All filters use tags for server-side filtering
+// Tag format: gender_men, gender_women, gender_unisex
+//             type_EDP, type_EDT, type_Parfum
+//             season_summer, season_spring, season_autumn, season_winter
+//             signature_true
 export interface ProductFilters {
-  gender?: string;
-  vendor?: string;
-  fragranceType?: string;
+  genders?: string[];      // Tag: gender_*
+  vendor?: string;         // product.vendor (native field)
+  fragranceTypes?: string[]; // Tag: type_*
   minPrice?: number;
   maxPrice?: number;
-  sizes?: string[];
+  sizes?: string[];        // Variant option: Size
   sortKey?: 'BEST_SELLING' | 'CREATED_AT' | 'PRICE' | 'TITLE';
   reverse?: boolean;
-  isSignature?: boolean;
-  season?: string;
+  isSignature?: boolean;   // Tag: signature_true
+  season?: string;         // Tag: season_*
+  tags?: string[];         // Direct tag query
 }
 
 // GraphQL fragment for product fields
@@ -291,30 +296,44 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
   return data;
 }
 
-// Build query string from filters
+// Build query string from filters using TAGS for server-side filtering
+// This ensures scalability to 3-5k products without client-side filtering
 function buildQueryString(filters: ProductFilters): string {
   const queryParts: string[] = [];
 
-  if (filters.gender) {
-    queryParts.push(`(metafield.namespace:custom AND metafield.key:gender AND metafield.value:${filters.gender})`);
+  // Gender filter via tags: gender_men, gender_women, gender_unisex
+  if (filters.genders && filters.genders.length > 0) {
+    const genderTags = filters.genders.map(g => `tag:gender_${g}`).join(' OR ');
+    queryParts.push(`(${genderTags})`);
   }
 
+  // Vendor (brand) - native Shopify field, server-side supported
   if (filters.vendor) {
     queryParts.push(`vendor:"${filters.vendor}"`);
   }
 
-  if (filters.fragranceType) {
-    queryParts.push(`(metafield.namespace:custom AND metafield.key:fragrance_type AND metafield.value:${filters.fragranceType})`);
+  // Fragrance type via tags: type_EDP, type_EDT, type_Parfum
+  if (filters.fragranceTypes && filters.fragranceTypes.length > 0) {
+    const typeTags = filters.fragranceTypes.map(t => `tag:type_${t}`).join(' OR ');
+    queryParts.push(`(${typeTags})`);
   }
 
+  // Signature collection via tag: signature_true
   if (filters.isSignature) {
-    queryParts.push(`(metafield.namespace:custom AND metafield.key:is_signature AND metafield.value:true)`);
+    queryParts.push(`tag:signature_true`);
   }
 
+  // Season via tags: season_summer, season_spring, etc.
   if (filters.season) {
-    queryParts.push(`(metafield.namespace:custom AND metafield.key:season AND metafield.value:${filters.season})`);
+    queryParts.push(`tag:season_${filters.season}`);
   }
 
+  // Direct tag query
+  if (filters.tags && filters.tags.length > 0) {
+    filters.tags.forEach(tag => queryParts.push(`tag:${tag}`));
+  }
+
+  // Price range - server-side supported
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
     const min = filters.minPrice ?? 0;
     const max = filters.maxPrice ?? 999999;
@@ -385,9 +404,9 @@ export async function fetchSeasonalCollection(season: string, first: number = 8)
   return fetchShopifyProducts(first, { season });
 }
 
-// Fetch products by gender
+// Fetch products by gender (uses tag: gender_*)
 export async function fetchProductsByGender(gender: string, first: number = 50): Promise<ShopifyProduct[]> {
-  return fetchShopifyProducts(first, { gender });
+  return fetchShopifyProducts(first, { genders: [gender] });
 }
 
 // Fetch products by vendor (brand)
