@@ -4,7 +4,7 @@ import ProductCard from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { products, collections } from "@/data/products";
 import { ArrowRight } from "lucide-react";
-import heroBg from "@/assets/hero-elegant.jpg";
+import AnimatedHero from "@/components/home/AnimatedHero";
 
 const Index = () => {
   const featuredProducts = products.filter(p => p.collection === "bestsellers").slice(0, 4);
@@ -12,44 +12,8 @@ const Index = () => {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${heroBg})`,
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-obsidian/90 via-obsidian/60 to-obsidian/20" />
-        </div>
-
-        <div className="relative z-10 container-montis">
-          <div className="max-w-xl">
-            <p className="font-body text-sm tracking-[0.3em] uppercase text-bone-light/80 mb-4">
-              Provjerena autentičnost
-            </p>
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl tracking-wide mb-6 text-bone-light">
-              Montis
-            </h1>
-            <p className="font-body text-lg tracking-wide mb-10 text-bone-light/90 leading-relaxed">
-              Mjesto iznad sumnje. Pažljivo odabrani luksuzni parfemi 
-              s provjerenom autentičnošću.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="gold" size="lg" asChild>
-                <Link to="/kolekcija">
-                  Istražite kolekciju
-                </Link>
-              </Button>
-              <Button variant="outlineLight" size="lg" asChild>
-                <Link to="/kolekcija?collection=new">
-                  Novo u ponudi
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Animated Hero Section */}
+      <AnimatedHero />
 
       {/* Collections Grid */}
       <section className="py-20 md:py-28">
