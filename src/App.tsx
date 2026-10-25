@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import ShopifyProductPage from "./pages/ShopifyProductPage";
 import NotFound from "./pages/NotFound";
+import Maxial from "./pages/Maxial";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/kolekcija" element={<Collection />} />
           <Route path="/proizvod/:handle" element={<ShopifyProductPage />} />
+          <Route path="/maxial" element={<Maxial />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
