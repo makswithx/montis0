@@ -37,7 +37,7 @@
   font-display: swap;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap');
 
 @layer base {
   :root {
@@ -90,6 +90,34 @@
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* MAXIAL – women's cosmetics demo theme (scoped) */
+  .theme-maxial {
+    --background: 30 45% 97%;
+    --foreground: 340 22% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 340 22% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 22% 16%;
+    --primary: 340 24% 18%;
+    --primary-foreground: 30 45% 97%;
+    --secondary: 350 55% 93%;
+    --secondary-foreground: 340 22% 16%;
+    --muted: 350 35% 95%;
+    --muted-foreground: 340 10% 42%;
+    --accent: 348 52% 60%;
+    --accent-foreground: 0 0% 100%;
+    --border: 350 22% 88%;
+    --input: 350 22% 88%;
+    --ring: 348 52% 60%;
+    --radius: 0.75rem;
+
+    --blush: 350 60% 91%;
+    --petal: 348 52% 60%;
+    --petal-deep: 342 42% 40%;
+    --cream: 30 45% 97%;
+    --sale: 352 72% 48%;
   }
 
   .dark {
