@@ -16,8 +16,17 @@ export default {
       fontFamily: {
         display: ['Playfair Display', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
+        maxial: ['Cormorant Garamond', 'Georgia', 'serif'],
+        'maxial-sans': ['Jost', 'system-ui', 'sans-serif'],
       },
       colors: {
+        blush: "hsl(var(--blush))",
+        petal: {
+          DEFAULT: "hsl(var(--petal))",
+          deep: "hsl(var(--petal-deep))",
+        },
+        cream: "hsl(var(--cream))",
+        sale: "hsl(var(--sale))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
