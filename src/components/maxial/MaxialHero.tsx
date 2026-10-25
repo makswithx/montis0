@@ -84,17 +84,17 @@ const MaxialHero = () => {
       </div>
 
       {/* Spinning discount badge */}
-      <div className="absolute top-8 right-6 md:top-14 md:right-16 z-10 w-24 h-24 md:w-32 md:h-32">
+      <div className="absolute top-8 right-6 md:top-14 md:right-16 z-10 w-28 h-28 md:w-36 md:h-36">
         <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full animate-maxial-spin text-petal-deep">
           <defs>
-            <path id="maxial-circle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
+            <path id="maxial-circle" d="M50,50 m-42,0 a42,42 0 1,1 84,0 a42,42 0 1,1 -84,0" />
           </defs>
-          <text fontSize="9.5" letterSpacing="3" fill="currentColor" className="uppercase">
+          <text fontSize="9" letterSpacing="2.6" fill="currentColor" className="uppercase">
             <textPath href="#maxial-circle">Proljetna akcija • Glow sale • </textPath>
           </text>
         </svg>
-        <div className="absolute inset-[22%] rounded-full bg-petal-deep text-cream flex flex-col items-center justify-center shadow-lg">
-          <span className="font-maxial text-2xl md:text-3xl font-semibold leading-none">−25%</span>
+        <div className="absolute inset-[24%] rounded-full bg-petal-deep text-cream flex flex-col items-center justify-center shadow-lg">
+          <span className="font-maxial text-xl md:text-2xl font-semibold leading-none">−25%</span>
         </div>
       </div>
 

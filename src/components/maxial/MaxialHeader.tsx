@@ -14,8 +14,7 @@ const navLinks = [
   { label: "Njega lica", hasMenu: true },
   { label: "Šminka", hasMenu: true },
   { label: "Njega tijela", hasMenu: true },
-  { label: "Brendovi", hasMenu: true },
-];
+  ];
 
 const MaxialHeader = () => {
   const [open, setOpen] = useState(false);
@@ -51,11 +50,11 @@ const MaxialHeader = () => {
               >
                 {open ? <X size={22} /> : <Menu size={22} />}
               </button>
-              <nav className="hidden lg:flex items-center gap-6">
+              <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
                 {navLinks.map((l) => (
                   <button
                     key={l.label}
-                    className="flex items-center gap-1 text-sm tracking-wide text-foreground/80 hover:text-foreground transition-colors"
+                    className="flex items-center gap-1 whitespace-nowrap text-sm tracking-wide text-foreground/80 hover:text-foreground transition-colors"
                   >
                     {l.label}
                     {l.hasMenu && <ChevronDown size={14} className="opacity-60" />}

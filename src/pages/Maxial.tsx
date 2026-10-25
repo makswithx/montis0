@@ -145,7 +145,7 @@ const Maxial = () => {
                 </div>
                 <div className="pt-4">
                   <p className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">{p.brand}</p>
-                  <h3 className="mt-1 text-sm md:text-[15px] leading-snug">{p.name}</h3>
+                  <h3 className="mt-1 font-maxial-sans text-sm md:text-[15px] leading-snug tracking-normal">{p.name}</h3>
                   <div className="flex items-center gap-1 mt-2">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star key={i} size={12} className="fill-petal text-petal" />
